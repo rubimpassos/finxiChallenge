@@ -1,0 +1,3 @@
+# finxiChallenge
+
+Desafio Finxi
