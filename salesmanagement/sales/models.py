@@ -1,10 +1,4 @@
-import os
-from pathlib import Path
-
-from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import formats
-from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 
 from salesmanagement.sales.validators import validate_extension
