@@ -4,7 +4,8 @@ from django.forms.widgets import DateInput
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 
-from salesmanagement.importer.models import Company, SalesImportFile
+from salesmanagement.importer.models import SalesImportFile
+from salesmanagement.manager.models import Company
 
 
 class SalesImportForm(ModelForm):

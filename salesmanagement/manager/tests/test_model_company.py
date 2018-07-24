@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.test import TestCase
 
-from salesmanagement.importer.models import Company
+from salesmanagement.manager.models import Company
 
 
 class CompanyModelTest(TestCase):

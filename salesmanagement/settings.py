@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'salesmanagement.core',
-    'salesmanagement.importer'
+    'salesmanagement.manager',
+    'salesmanagement.importer',
 ]
 
 MIDDLEWARE = [

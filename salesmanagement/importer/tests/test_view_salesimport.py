@@ -6,7 +6,8 @@ from django.shortcuts import resolve_url as r
 from django.test import TestCase
 
 from salesmanagement.importer.forms import SalesImportForm
-from salesmanagement.importer.models import SalesImportFile, Company
+from salesmanagement.importer.models import SalesImportFile
+from salesmanagement.manager.models import Company
 from salesmanagement.importer.tests import get_temporary_text_file, mock_storage
 
 
@@ -115,10 +116,19 @@ class SalesImportViewPostInvalidExtension(TestCase):
         self.assertIsInstance(form, SalesImportForm)
 
     def test_form_has_extension_error(self):
-        """Must show a error message with valid extensions"""
+        """Must show a error message"""
         form = self.response.context['form']
-        expected = form.errors['file'][0]
-        self.assertEqual('Arquivo não suportado. Extensões válidas: .xls, .xlsx, .xlsm, .csv', expected)
+        self.assertTrue(form.errors['file'][0])
+
+    def test_form_extension_error_show_valid_extensions(self):
+        """Must show a message with valid extensions"""
+        form = self.response.context['form']
+        error_message = form.errors['file'][0]
+        valid_extensions = ['xls', 'xlsx', 'xlsm', 'csv']
+
+        for ext in valid_extensions:
+            with self.subTest():
+                self.assertIn(ext, error_message)
 
 
 class SalesImportViewPostInvalidMounth(TestCase):
