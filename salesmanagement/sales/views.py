@@ -3,11 +3,11 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 
 from salesmanagement.sales.forms import SalesImportForm
-from salesmanagement.sales.models import SalesFile
+from salesmanagement.sales.models import SalesImportFile
 
 
 class SalesImportView(SuccessMessageMixin, CreateView):
-    model = SalesFile
+    model = SalesImportFile
     form_class = SalesImportForm
     template_name = 'sales/salesimport_form.html'
     success_url = reverse_lazy('sales-import')

@@ -4,14 +4,14 @@ from django.forms.widgets import DateInput
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
 
-from salesmanagement.sales.models import Company, SalesFile
+from salesmanagement.sales.models import Company, SalesImportFile
 
 
 class SalesImportForm(ModelForm):
     company = CharField(label=_('Nome da Empresa'), max_length=150, required=True)
 
     class Meta:
-        model = SalesFile
+        model = SalesImportFile
         fields = ('month', 'file')
         widgets = {
             'month': DateInput(attrs={'type': 'date'})
@@ -33,7 +33,7 @@ class SalesImportForm(ModelForm):
             return
 
         month = cleaned_data['month']
-        files = SalesFile.objects.filter(month__month=month.month, month__year=month.year, company=company)
+        files = SalesImportFile.objects.filter(month__month=month.month, month__year=month.year, company=company)
         if files.exists():
             date = formats.date_format(month, format="YEAR_MONTH_FORMAT", use_l10n=True)
             raise ValidationError(_('O arquivo do mês de {} já foi importado para {}'.format(date, company)))

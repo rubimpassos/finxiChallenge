@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from salesmanagement.sales.models import Company, SalesFile
+from salesmanagement.sales.models import Company, SalesImportFile
 
 
 class CompanyAdmin(admin.ModelAdmin):
@@ -12,4 +12,4 @@ class SalesFileAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Company, CompanyAdmin)
-admin.site.register(SalesFile, SalesFileAdmin)
+admin.site.register(SalesImportFile, SalesFileAdmin)

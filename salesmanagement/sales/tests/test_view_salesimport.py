@@ -6,7 +6,7 @@ from django.shortcuts import resolve_url as r
 from django.test import TestCase
 
 from salesmanagement.sales.forms import SalesImportForm
-from salesmanagement.sales.models import SalesFile, Company
+from salesmanagement.sales.models import SalesImportFile, Company
 from salesmanagement.sales.tests import get_temporary_text_file, mock_storage
 
 
@@ -61,7 +61,7 @@ class SalesImportViewPostValid(TestCase):
         self.assertTrue(Company.objects.exists())
 
     def test_sales_file(self):
-        self.assertTrue(SalesFile.objects.exists())
+        self.assertTrue(SalesImportFile.objects.exists())
 
     def test_success_message(self):
         """Must show a success message"""
@@ -129,7 +129,7 @@ class SalesImportViewPostInvalidMounth(TestCase):
         data = dict(company='Company Name', month='01/07/2018', file=file)
 
         with mock_storage('sales_imported_files/FileName.xlsx'):
-            self.obj = SalesFile.objects.create(company=company, file=file, month=month)
+            self.obj = SalesImportFile.objects.create(company=company, file=file, month=month)
             self.response = self.client.post(r('sales-import'), data)
 
     def test_post(self):
