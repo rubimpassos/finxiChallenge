@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from salesmanagement.sales.models import Company, SalesImportFile
+from salesmanagement.importer.models import Company, SalesImportFile
 
 
 class CompanyAdmin(admin.ModelAdmin):

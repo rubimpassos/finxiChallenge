@@ -5,9 +5,9 @@ from django.contrib.messages import get_messages
 from django.shortcuts import resolve_url as r
 from django.test import TestCase
 
-from salesmanagement.sales.forms import SalesImportForm
-from salesmanagement.sales.models import SalesImportFile, Company
-from salesmanagement.sales.tests import get_temporary_text_file, mock_storage
+from salesmanagement.importer.forms import SalesImportForm
+from salesmanagement.importer.models import SalesImportFile, Company
+from salesmanagement.importer.tests import get_temporary_text_file, mock_storage
 
 
 class SalesImportViewGet(TestCase):
@@ -20,7 +20,7 @@ class SalesImportViewGet(TestCase):
 
     def test_template(self):
         """Must use salesimport_form.html"""
-        self.assertTemplateUsed(self.response, 'sales/salesimport_form.html')
+        self.assertTemplateUsed(self.response, 'importer/salesimport_form.html')
 
     def test_html(self):
         """Html must contain specific input tags"""
@@ -80,7 +80,7 @@ class SalesImportViewPostInvalid(TestCase):
 
     def test_template(self):
         """Must use salesimport_form.html"""
-        self.assertTemplateUsed(self.response, 'sales/salesimport_form.html')
+        self.assertTemplateUsed(self.response, 'importer/salesimport_form.html')
 
     def test_form_has_errors(self):
         form = self.response.context['form']
@@ -104,7 +104,7 @@ class SalesImportViewPostInvalidExtension(TestCase):
 
     def test_template(self):
         """Must use salesimport_form.html"""
-        self.assertTemplateUsed(self.response, 'sales/salesimport_form.html')
+        self.assertTemplateUsed(self.response, 'importer/salesimport_form.html')
 
     def test_form_has_errors(self):
         form = self.response.context['form']
@@ -138,7 +138,7 @@ class SalesImportViewPostInvalidMounth(TestCase):
 
     def test_template(self):
         """Must use salesimport_form.html"""
-        self.assertTemplateUsed(self.response, 'sales/salesimport_form.html')
+        self.assertTemplateUsed(self.response, 'importer/salesimport_form.html')
 
     def test_form_has_errors(self):
         form = self.response.context['form']

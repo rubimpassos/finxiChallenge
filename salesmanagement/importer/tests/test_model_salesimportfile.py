@@ -2,8 +2,8 @@ from datetime import date, datetime
 
 from django.test import TestCase
 
-from salesmanagement.sales.models import SalesImportFile, Company
-from salesmanagement.sales.tests import mock_storage, get_temporary_text_file
+from salesmanagement.importer.models import SalesImportFile, Company
+from salesmanagement.importer.tests import mock_storage, get_temporary_text_file
 
 
 class SalesImportFileModelTest(TestCase):

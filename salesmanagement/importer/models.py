@@ -1,7 +1,7 @@
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
-from salesmanagement.sales.validators import validate_extension
+from salesmanagement.importer.validators import validate_extension
 
 
 class Company(TimeStampedModel):
