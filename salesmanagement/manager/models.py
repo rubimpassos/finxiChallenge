@@ -30,6 +30,7 @@ class ProductCategory(TimeStampedModel):
 class Product(TimeStampedModel):
     name = models.CharField(_('nome'), max_length=255)
     category = models.ForeignKey(ProductCategory, verbose_name=_('categoria'), on_delete=models.CASCADE)
+    company = models.ManyToManyField(Company, related_name=_('Empresa'))
 
     class Meta:
         verbose_name = 'produto'

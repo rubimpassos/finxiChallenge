@@ -1,5 +1,6 @@
 import locale
 
+from djmoney.money import Money
 from openpyxl import load_workbook
 
 
@@ -57,4 +58,4 @@ class ParserSalesXlsx:
     def parse_currency(currency_string):
         n = currency_string.replace('R$', '').strip()
         locale.setlocale(locale.LC_ALL, 'Portuguese_Brazil.1252')
-        return locale.atof(n)
+        return Money(locale.atof(n), 'BRL')

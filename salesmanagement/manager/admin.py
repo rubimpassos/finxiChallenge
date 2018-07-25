@@ -60,14 +60,14 @@ class ProductAdmin(admin.ModelAdmin):
     def current_cost(self, obj):
         """Get last manufacturing cost in the month"""
         last_sale = obj.productssale_set.last()
-        return last_sale.cost
+        return getattr(last_sale, 'cost', '')
 
     current_cost.short_description = _('custo atual')
 
     def current_price(self, obj):
         """Get last sale price in the month"""
         last_sale = obj.productssale_set.last()
-        return last_sale.price
+        return getattr(last_sale, 'price', '')
 
     current_price.short_description = _('preço de venda atual')
 

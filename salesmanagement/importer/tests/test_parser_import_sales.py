@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from django.test import TestCase
+from djmoney.money import Money
 
 from salesmanagement.importer.parser import ParserSalesXlsx
 
@@ -43,13 +44,15 @@ class ParserSalesXlsxTestValid(TestCase):
 
     def test_parse_currency_to_float_valid(self):
         currency_float = self.parser.parse_currency('R$ 45,30')
-        expected = 45.3
+        expected = Money(45.3, 'BRL')
         self.assertEqual(expected, currency_float)
 
     def test_output_list(self):
         expected = [
-            {'product': 'Product Low', 'category': 'Category A', 'sold': 9, 'cost': 4.7, 'total': 47.3},
-            {'product': 'Product High', 'category': 'Category B', 'sold': 5, 'cost': 3.2, 'total': 107.5}
+            {'product': 'Product Low', 'category': 'Category A', 'sold': 9, 'cost': Money(4.7, 'BRL'),
+             'total': Money(47.3, 'BRL')},
+            {'product': 'Product High', 'category': 'Category B', 'sold': 5, 'cost': Money(3.2, 'BRL'),
+             'total': Money(107.5, 'BRL')}
         ]
         self.assertEqual(expected, self.data)
 

@@ -15,7 +15,8 @@ class ImportSalesTaskTest(TestCase):
             {'product': 'Product Low', 'category': 'Category A', 'sold': 9, 'cost': 4.70, 'total': 47.30},
             {'product': 'Product High', 'category': 'Category B', 'sold': 5, 'cost': 3.20, 'total': 107.50}
         ]
-        mock_get.return_value.company = Company.objects.create(name='Company Name')
+        self.company = Company.objects.create(name='Company Name')
+        mock_get.return_value.company = self.company
         mock_get.return_value.month = date.today().replace(day=1)
         with patch.object(ParserSalesXlsx, 'as_data', return_value=data):
             import_sales_task(1)
@@ -27,6 +28,12 @@ class ImportSalesTaskTest(TestCase):
     def test_must_create_products(self):
         """Must create 2 products"""
         self.assertEqual(2, Product.objects.count())
+
+    def test_products_must_have_company(self):
+        """Must add company to products"""
+        product = Product.objects.first()
+        companies = product.company.all()
+        self.assertIn(self.company, companies)
 
     def test_must_create_products_sale(self):
         """Must create 2 products sales"""

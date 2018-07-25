@@ -13,6 +13,7 @@ class ProductsSaleModelTest(TestCase):
         company = Company.objects.create(name='Company name')
         category = ProductCategory.objects.create(name='Category name')
         product = Product.objects.create(name='Product name', category=category)
+        product.company.set([company])
         sale_month = date(day=1, month=7, year=2018)
         cls.obj = ProductsSale.objects.create(
             company=company,
@@ -58,11 +59,11 @@ class ProductsSaleModelTest(TestCase):
         self.assertEqual(expected, self.obj.price)
 
     def test_created(self):
-        """Company must have an self-managed created attr"""
+        """Company must have an self-managed created datetime field"""
         self.assertIsInstance(self.obj.created, datetime)
 
     def test_modified(self):
-        """Company must have an self-managed modified attr"""
+        """Company must have an self-managed modified datetime field"""
         self.assertIsInstance(self.obj.modified, datetime)
 
     def test_str(self):
