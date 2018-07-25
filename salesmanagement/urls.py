@@ -18,7 +18,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+from salesmanagement.core.views import HomeView
+
+
 urlpatterns = [
+    path('', HomeView.as_view(), name='home'),
     path('sales/', include('salesmanagement.importer.urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <section>
+        <div class="content row padding-bottom-3 desktop-12 container">
+            <h1>Olá,</h1>
+            <p>Bem vindo ao nosso site!</p>
+            <p><a class="btn btn-info" href="{% url 'importer:sales-import' %}">Clique aqui para importar um arquivo de registro de vendas!</a></p>
+        </div>
+    </section>
+{% endblock %}
+{% block js %}
+    <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+    <script src="{% static 'js/jquery.stellar.min.js' %}"></script>
+    <script src="{% static 'js/smooth-scroll.js' %}"></script>
+    <script src="{% static 'js/retina-1.1.0.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+{% endblock %}

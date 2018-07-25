@@ -10,5 +10,5 @@ class SalesImportView(SuccessMessageMixin, CreateView):
     model = SalesImportFile
     form_class = SalesImportForm
     template_name = 'importer/salesimport_form.html'
-    success_url = reverse_lazy('sales-import')
+    success_url = reverse_lazy('importer:sales-import')
     success_message = "Arquivo adicionado! Assim que for importado você será notificado."

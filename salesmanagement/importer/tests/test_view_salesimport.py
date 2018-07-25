@@ -12,7 +12,7 @@ from salesmanagement.importer.tests import get_temporary_text_file, mock_storage
 
 class SalesImportViewGet(NoImportSalesSignalsTestCase):
     def setUp(self):
-        self.response = self.client.get(r('sales-import'))
+        self.response = self.client.get(r('importer:sales-import'))
 
     def test_get(self):
         """GET / must return status code 200"""
@@ -51,11 +51,11 @@ class SalesImportViewPostValid(NoImportSalesSignalsTestCase):
         file_path = Path('sales_imported_files/FileName.xlsx')
         data = dict(company='Company Name', month='01/07/2018', file=get_temporary_text_file(file_path.name))
         with mock_storage(file_path.as_posix()):
-            self.response = self.client.post(r('sales-import'), data)
+            self.response = self.client.post(r('importer:sales-import'), data)
 
     def test_post(self):
         """Must redirect to same page"""
-        self.assertRedirects(self.response, r('sales-import'))
+        self.assertRedirects(self.response, r('importer:sales-import'))
 
     def test_company(self):
         self.assertTrue(Company.objects.exists())
@@ -72,7 +72,7 @@ class SalesImportViewPostValid(NoImportSalesSignalsTestCase):
 
 class SalesImportViewPostInvalid(NoImportSalesSignalsTestCase):
     def setUp(self):
-        self.response = self.client.post(r('sales-import'), {})
+        self.response = self.client.post(r('importer:sales-import'), {})
 
     def test_post(self):
         """Invalid POST should not redirect"""
@@ -96,7 +96,7 @@ class SalesImportViewPostInvalidExtension(NoImportSalesSignalsTestCase):
         file_path = Path('sales_imported_files/FileName.jpg')
         data = dict(company='Company Name', month='01/07/2018', file=get_temporary_text_file(file_path.name))
         with mock_storage(file_path.as_posix()):
-            self.response = self.client.post(r('sales-import'), data)
+            self.response = self.client.post(r('importer:sales-import'), data)
 
     def test_post(self):
         """Invalid POST should not redirect"""
@@ -139,7 +139,7 @@ class SalesImportViewPostInvalidMounth(NoImportSalesSignalsTestCase):
 
         with mock_storage('sales_imported_files/FileName.xlsx'):
             self.obj = SalesImportFile.objects.create(company=company, file=file, month=month)
-            self.response = self.client.post(r('sales-import'), data)
+            self.response = self.client.post(r('importer:sales-import'), data)
 
     def test_post(self):
         """Invalid POST should not redirect"""
