@@ -4,11 +4,11 @@ from django.utils import formats
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from salesmanagement.manager.models import ProductsSale, ProductCompanyThrough
+from salesmanagement.manager.models import ProductsSale, Product
 
 
 class CompanyProductsInline(admin.TabularInline):
-    model = ProductCompanyThrough
+    model = Product.company.through
     extra = 0
     verbose_name = "Produto"
     verbose_name_plural = "Produtos"
