@@ -75,5 +75,8 @@ class ProductsSale(TimeStampedModel):
     @property
     def price(self):
         """Sale price"""
-        return self.total/self.sold
+        sold = self.sold
+        if not sold:
+            return 0
+        return Money(self.total.amount/sold, 'BRL')
 
