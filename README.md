@@ -1,13 +1,16 @@
 # Finxi code Challenge
 
-Desenvolva um sistema web para importação e processamento de vendas, seguindo os requisitos:
+### Desenvolva um sistema web para importação e processamento de vendas, seguindo os requisitos:
+
 1. Preencher um formulário com nome da empresa (texto livre) e importar o arquivo contendo minhas vendas do mês (arquivo em anexo);
 2. Após enviar o arquivo, o sistema deverá identificar as vendas por produto, o total de produtos vendidos, a média do preço de venda, custo e categoria;
 3. Como usuário, preciso ter acesso a essas importações e realizar alguns filtros, como nome da empresa, nome do produto e categoria;
 4. Ao fim do processamento, o usuário deverá receber algum tipo de alerta que a planilha enviada foi processada com sucesso;
 
 
-Informações importantes:
+
+### Informações importantes:
+
 1. O formulário de importação das vendas deve ser feitos através de um CMS. Não utilize o admin do Django para isso;
 2. A visualização de produtos, filtros e médias deve ser por empresa;
 3. O processamento da planilha deve acontecer em segundo plano, possibilitando que o usuário receba o alerta de conclusão em qualquer área do sistema (fora o admin do django). Ex: Após enviar a planilha, como usuário, devo poder retornar a tela de importação ou listagem e enviar outro arquivo enquanto o primeiro está sendo processado, recebendo o alerta onde eu estiver;
