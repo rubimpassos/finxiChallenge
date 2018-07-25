@@ -1,43 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Importar Vendas</title>
-</head>
-<body>
-<section>
-    <div class="content row padding-bottom-3 desktop-12 container">
-        <h1>Importar Vendas</h1>
-        {% if messages %}
-          <ul class="messages">
-            {% for message in messages %}
-              <li class="{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-        <div class="desktop-6">
-            <form action="." novalidate method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form.non_field_errors }}
-                <div class="form-row label-block input-text">
-                    <label for="{{ form.company.id_for_label }}">{{ form.company.label }}</label>
-                    {{ form.company.errors }}
-                    {{ form.company}}
-                </div>
-                <div class="form-row label-block input-text">
-                    <label for="{{ form.month.id_for_label }}">{{ form.month.label }}</label>
-                    {{ form.month.errors }}
-                    {{ form.month }}
-                </div>
-                <div class="form-row label-block input-text">
-                    <label for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
-                    {{ form.file.errors }}
-                    {{ form.file }}
-                </div>
-                <p class="btn-row"><input type="submit" value="Importar!"/></p>
-            </form>
+{% extends 'base.html' %}
+{% block content %}
+    <section>
+        <div class="content row padding-bottom-3 desktop-12 container">
+            <h1>Importar Vendas</h1>
+            {% if messages %}
+              <ul class="messages">
+                {% for message in messages %}
+                  <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            <div class="desktop-6">
+                <form action="." novalidate method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="form-row label-block input-text">
+                        <label for="{{ form.company.id_for_label }}">{{ form.company.label }}</label>
+                        {{ form.company.errors }}
+                        {{ form.company}}
+                    </div>
+                    <div class="form-row label-block input-text">
+                        <label for="{{ form.month.id_for_label }}">{{ form.month.label }}</label>
+                        {{ form.month.errors }}
+                        {{ form.month }}
+                    </div>
+                    <div class="form-row label-block input-text">
+                        <label for="{{ form.file.id_for_label }}">{{ form.file.label }}</label>
+                        {{ form.file.errors }}
+                        {{ form.file }}
+                    </div>
+                    <p class="btn-row"><input type="submit" value="Importar!"/></p>
+                </form>
+            </div>
         </div>
-    </div>
-</section>
-</body>
-</html>
+    </section>
+{% endblock %}
