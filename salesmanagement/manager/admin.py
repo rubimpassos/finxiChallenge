@@ -20,7 +20,9 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'current_cost', 'current_price')
     list_display_links = None
+    list_filter = ('category', 'name', )
     readonly_fields = list_display+('company',)
+    search_fields = ('name', 'category__name')
     date_hierarchy = 'created'
     inlines = [ProducSalesInline]
 
