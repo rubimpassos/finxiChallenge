@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'djmoney',
     'salesmanagement.core',
     'salesmanagement.manager',
     'salesmanagement.importer',

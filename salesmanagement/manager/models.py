@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
+from djmoney.models.fields import MoneyField
 
 
 class Company(TimeStampedModel):
@@ -19,8 +20,8 @@ class ProductCategory(TimeStampedModel):
     name = models.CharField(_('nome'), max_length=80)
 
     class Meta:
-        verbose_name = 'categoria'
-        verbose_name_plural = 'categorias'
+        verbose_name = 'categoria de produto'
+        verbose_name_plural = 'categorias de produtos'
 
     def __str__(self):
         return self.name
@@ -42,8 +43,8 @@ class ProductsSale(TimeStampedModel):
     company = models.ForeignKey(Company, verbose_name=_('empresa'), on_delete=models.CASCADE)
     product = models.ForeignKey(Product, verbose_name=_('produto'), on_delete=models.CASCADE)
     sold = models.IntegerField(_('unidades vendidas'))
-    cost = models.FloatField(_('preço de custo'))
-    total = models.FloatField(_('total da venda'))
+    cost = MoneyField(_('preço de custo'), max_digits=14, decimal_places=2, default_currency='BRL')
+    total = MoneyField(_('total da venda'), max_digits=14, decimal_places=2, default_currency='BRL')
     sale_month = models.DateField(_('mês de venda'))
 
     class Meta:
@@ -57,4 +58,9 @@ class ProductsSale(TimeStampedModel):
             product=self.product.name,
             month_year=month_year
         )
+
+    @property
+    def price(self):
+        """Sale price"""
+        return self.total/self.sold
 

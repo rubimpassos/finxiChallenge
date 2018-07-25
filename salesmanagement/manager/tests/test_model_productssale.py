@@ -1,6 +1,7 @@
 from datetime import datetime, date
 
 from django.test import TestCase
+from djmoney.money import Money
 
 from salesmanagement.manager.models import Company, ProductsSale, Product, ProductCategory
 
@@ -26,28 +27,35 @@ class ProductsSaleModelTest(TestCase):
         self.assertTrue(ProductsSale.objects.exists())
 
     def test_company(self):
-        """Must have company attr"""
+        """Must have company foreign field"""
         self.assertIsInstance(self.obj.company, Company)
 
     def test_product(self):
-        """Must have product attr"""
+        """Must have product foreign field"""
         self.assertIsInstance(self.obj.product, Product)
 
     def test_sold(self):
-        """Must have sold attr"""
+        """Must have sold int field"""
         self.assertIsInstance(self.obj.sold, int)
 
     def test_cost(self):
-        """Must have cost attr"""
-        self.assertIsInstance(self.obj.cost, float)
+        """Must have cost money field"""
+        self.assertEqual(Money(5.6, 'BRL'), self.obj.cost)
 
     def test_total(self):
-        """Must have total attr"""
-        self.assertIsInstance(self.obj.total, float)
+        """Must have total money field"""
+        self.assertEqual(Money(150.5, 'BRL'), self.obj.total)
 
     def test_sale_month(self):
-        """Must have sale_month attr"""
+        """Must have sale_month field"""
         self.assertIsInstance(self.obj.sale_month, date)
+
+    def test_price(self):
+        """Must have sale price method as money field"""
+        sold = 10
+        total = 150.5
+        expected = Money(total/sold, 'BRL')
+        self.assertEqual(expected, self.obj.price)
 
     def test_created(self):
         """Company must have an self-managed created attr"""
