@@ -1,22 +1,20 @@
 from datetime import date, datetime
 
-from django.test import TestCase
-
 from salesmanagement.importer.models import SalesImportFile
 from salesmanagement.manager.models import Company
-from salesmanagement.importer.tests import mock_storage, get_temporary_text_file
+from salesmanagement.importer.tests import mock_storage, get_temporary_text_file, NoImportSalesSignalsTestCase
 
 
-class SalesImportFileModelTest(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super(SalesImportFileModelTest, cls).setUpClass()
+class SalesImportFileModelTest(NoImportSalesSignalsTestCase):
+    def setUp(self):
+        super(SalesImportFileModelTest, self).setUpClass()
         month = date.today().replace(day=1)
 
-        cls.company = Company.objects.create(name='Company Name')
+        self.company = Company.objects.create(name='Company Name')
         with mock_storage('sales_imported_files/FileName.xlsx'):
-            cls.obj = SalesImportFile.objects.create(company=cls.company, file=get_temporary_text_file("FileName.xlsx"),
-                                                     month=month)
+            self.obj = SalesImportFile.objects.create(company=self.company,
+                                                      file=get_temporary_text_file("FileName.xlsx"),
+                                                      month=month)
 
     def test_create(self):
         self.assertTrue(SalesImportFile.objects.exists())

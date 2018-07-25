@@ -3,15 +3,14 @@ from pathlib import Path
 
 from django.contrib.messages import get_messages
 from django.shortcuts import resolve_url as r
-from django.test import TestCase
 
 from salesmanagement.importer.forms import SalesImportForm
 from salesmanagement.importer.models import SalesImportFile
 from salesmanagement.manager.models import Company
-from salesmanagement.importer.tests import get_temporary_text_file, mock_storage
+from salesmanagement.importer.tests import get_temporary_text_file, mock_storage, NoImportSalesSignalsTestCase
 
 
-class SalesImportViewGet(TestCase):
+class SalesImportViewGet(NoImportSalesSignalsTestCase):
     def setUp(self):
         self.response = self.client.get(r('sales-import'))
 
@@ -47,7 +46,7 @@ class SalesImportViewGet(TestCase):
         self.assertIsInstance(form, SalesImportForm)
 
 
-class SalesImportViewPostValid(TestCase):
+class SalesImportViewPostValid(NoImportSalesSignalsTestCase):
     def setUp(self):
         file_path = Path('sales_imported_files/FileName.xlsx')
         data = dict(company='Company Name', month='01/07/2018', file=get_temporary_text_file(file_path.name))
@@ -71,7 +70,7 @@ class SalesImportViewPostValid(TestCase):
         self.assertEqual('Arquivo adicionado! Assim que for importado você será notificado.', str(messages[0]))
 
 
-class SalesImportViewPostInvalid(TestCase):
+class SalesImportViewPostInvalid(NoImportSalesSignalsTestCase):
     def setUp(self):
         self.response = self.client.post(r('sales-import'), {})
 
@@ -92,7 +91,7 @@ class SalesImportViewPostInvalid(TestCase):
         self.assertIsInstance(form, SalesImportForm)
 
 
-class SalesImportViewPostInvalidExtension(TestCase):
+class SalesImportViewPostInvalidExtension(NoImportSalesSignalsTestCase):
     def setUp(self):
         file_path = Path('sales_imported_files/FileName.jpg')
         data = dict(company='Company Name', month='01/07/2018', file=get_temporary_text_file(file_path.name))
@@ -124,14 +123,14 @@ class SalesImportViewPostInvalidExtension(TestCase):
         """Must show a message with valid extensions"""
         form = self.response.context['form']
         error_message = form.errors['file'][0]
-        valid_extensions = ['xls', 'xlsx', 'xlsm', 'csv']
+        valid_extensions = ['xlsx']
 
         for ext in valid_extensions:
             with self.subTest():
                 self.assertIn(ext, error_message)
 
 
-class SalesImportViewPostInvalidMounth(TestCase):
+class SalesImportViewPostInvalidMounth(NoImportSalesSignalsTestCase):
     def setUp(self):
         company = Company.objects.create(name='Company Name')
         month = date(day=1, month=7, year=2018)

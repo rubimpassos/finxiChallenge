@@ -9,7 +9,7 @@ class SalesImportFile(TimeStampedModel):
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     month = models.DateField('Mês')
     file = models.FileField('Arquivo', upload_to='sales_imported_files',
-                            validators=[FileExtensionValidator(['xls', 'xlsx', 'xlsm', 'csv'])])
+                            validators=[FileExtensionValidator(['xlsx'])])
 
     class Meta:
         verbose_name = 'Arquivo Importado'
