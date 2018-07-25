@@ -2,47 +2,12 @@ from django.contrib import admin
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
+from salesmanagement.manager.inlines import ProducSalesInline, CompanyProductsInline
 from salesmanagement.manager.models import Company, Product, ProductCategory, ProductsSale
 
 
-class ProducsSalesInline(admin.TabularInline):
-    model = ProductsSale
-    extra = 0
-    can_delete = False
-    show_change_link = False
-    fields = ('product', 'category', 'sold', 'cost', 'month', 'total')
-    readonly_fields = fields
-    exclude = ('sale_month',)
-    ordering = ('created',)
-    classes = ('collapse',)
-
-    def category(self, obj):
-        return obj.product.category.name
-
-    category.short_description = _('categoria')
-
-    def month(self, obj):
-        month_year = formats.date_format(obj.sale_month, format="YEAR_MONTH_FORMAT", use_l10n=True)
-        return month_year
-
-    month.short_description = _('mês')
-
-    def price(self, obj):
-        return obj.price
-
-    price.short_description = _('preço de venda')
-
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        queryset.filter()
-        return
-
-    def has_add_permission(self, request):
-        return False
-
-
 class CompanyAdmin(admin.ModelAdmin):
-    inlines = [ProducsSalesInline]
+    inlines = [CompanyProductsInline]
     date_hierarchy = 'created'
 
 
@@ -55,7 +20,9 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'current_cost', 'current_price')
     list_display_links = None
+    readonly_fields = list_display+('company',)
     date_hierarchy = 'created'
+    inlines = [ProducSalesInline]
 
     def current_cost(self, obj):
         """Get last manufacturing cost in the month"""

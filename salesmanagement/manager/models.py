@@ -3,6 +3,7 @@ from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
 from djmoney.models.fields import MoneyField
+from djmoney.money import Money
 
 
 class Company(TimeStampedModel):
@@ -30,7 +31,7 @@ class ProductCategory(TimeStampedModel):
 class Product(TimeStampedModel):
     name = models.CharField(_('nome'), max_length=255)
     category = models.ForeignKey(ProductCategory, verbose_name=_('categoria'), on_delete=models.CASCADE)
-    company = models.ManyToManyField(Company, related_name=_('Empresa'))
+    company = models.ManyToManyField(Company, related_name=_('Empresa'), verbose_name=_('Empresa'))
 
     class Meta:
         verbose_name = 'produto'
@@ -38,6 +39,17 @@ class Product(TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+
+class ProductCompanyThrough(Product.company.through):
+    class Meta:
+        proxy = True
+
+    def __unicode__(self):
+        return ""
+
+    def __str__(self):
+        return ""
 
 
 class ProductsSale(TimeStampedModel):
