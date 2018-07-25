@@ -13,7 +13,7 @@ class ProductsSaleModelTest(TestCase):
         company = Company.objects.create(name='Company name')
         category = ProductCategory.objects.create(name='Category name')
         product = Product.objects.create(name='Product name', category=category)
-        product.company.set([company])
+        product.company.add(company)
         sale_month = date(day=1, month=7, year=2018)
         cls.obj = ProductsSale.objects.create(
             company=company,

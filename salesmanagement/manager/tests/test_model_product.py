@@ -12,7 +12,7 @@ class ProductModelTest(TestCase):
         company = Company.objects.create(name='Company name')
         category = ProductCategory.objects.create(name='Category A')
         cls.obj = Product.objects.create(name='Product name', category=category)
-        cls.obj.company.set([company])
+        cls.obj.company.add(company)
 
     def test_create(self):
         self.assertTrue(Product.objects.exists())

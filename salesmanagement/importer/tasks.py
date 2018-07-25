@@ -10,11 +10,13 @@ def import_sales_task(sale_file_pk):
     sale_file = SalesImportFile.objects.get(pk=sale_file_pk)
     company = sale_file.company
     sales = ParserSalesXlsx(sale_file.file.path).as_data()
-    print(sales)
+
     for sale in sales:
         category, result = ProductCategory.objects.get_or_create(name=sale['category'])
         product, result = Product.objects.get_or_create(name=sale['product'], category=category)
-        product.company.set([company])
+
+        if company not in product.company.all():
+            product.company.add(company)
 
         ProductsSale.objects.create(
             company=company,
