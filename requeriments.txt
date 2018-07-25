@@ -1,5 +1,9 @@
+celery==4.2.1
 Django==2.0.7
 django-environ==0.4.5
 django-extensions==2.1.0
+django-money==0.14.2
+mock-django==0.6.10
+openpyxl==2.5.4
 pytest==3.6.3
 pytest-django==3.3.2
