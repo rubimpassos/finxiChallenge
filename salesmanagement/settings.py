@@ -129,7 +129,7 @@ STATIC_URL = env('STATIC_URL', default='/static/')
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = env('MEDIA_URL', default='/media/')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = env('MEDIA_ROOT', default=os.path.join(BASE_DIR, 'media'))
 
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='amqp://localhost')
 CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='amqp://localhost')
