@@ -1,5 +1,6 @@
 from datetime import date
 from unittest.mock import patch
+
 from django.test import TestCase
 
 from salesmanagement.importer.models import SalesImportFile

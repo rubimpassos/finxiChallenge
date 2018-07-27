@@ -20,7 +20,6 @@ from django.urls import path, include
 
 from salesmanagement.core.views import HomeView
 
-
 urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('sales/', include('salesmanagement.importer.urls')),

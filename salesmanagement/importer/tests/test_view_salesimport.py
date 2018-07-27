@@ -6,8 +6,8 @@ from django.shortcuts import resolve_url as r
 
 from salesmanagement.importer.forms import SalesImportForm
 from salesmanagement.importer.models import SalesImportFile
-from salesmanagement.manager.models import Company
 from salesmanagement.importer.tests import get_temporary_text_file, mock_storage, NoImportSalesSignalsTestCase
+from salesmanagement.manager.models import Company
 
 
 class SalesImportViewGet(NoImportSalesSignalsTestCase):

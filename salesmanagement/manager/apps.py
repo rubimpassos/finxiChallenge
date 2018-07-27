@@ -6,4 +6,4 @@ class ManagerConfig(AppConfig):
     verbose_name = 'Administração de vendas'
 
     def ready(self):
-        import salesmanagement.manager.signals
+        pass

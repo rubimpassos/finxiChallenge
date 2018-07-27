@@ -76,4 +76,3 @@ class ParserSalesXlsxTestInvalid(TestCase):
         currency_float = self.parser.parse_currency('R$ 45.30')
         expected = 45.3
         self.assertNotEqual(expected, currency_float)
-

@@ -1,8 +1,8 @@
 from datetime import date, datetime
 
 from salesmanagement.importer.models import SalesImportFile
-from salesmanagement.manager.models import Company
 from salesmanagement.importer.tests import mock_storage, get_temporary_text_file, NoImportSalesSignalsTestCase
+from salesmanagement.manager.models import Company
 
 
 class SalesImportFileModelTest(NoImportSalesSignalsTestCase):

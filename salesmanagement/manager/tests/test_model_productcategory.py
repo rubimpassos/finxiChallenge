@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.test import TestCase
 
-from salesmanagement.manager.models import Company, ProductCategory
+from salesmanagement.manager.models import ProductCategory
 
 
 class ProductCategoryModelTest(TestCase):
