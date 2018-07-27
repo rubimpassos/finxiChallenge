@@ -5,18 +5,23 @@ from django.utils.translation import gettext_lazy as _
 from salesmanagement.manager.inlines import ProducSalesInline, CompanyProductsInline
 from salesmanagement.manager.models import Company, Product, ProductCategory, ProductsSale
 
+admin.site.site_header = _('Administração')
 
+
+@admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
     inlines = [CompanyProductsInline]
     date_hierarchy = 'created'
 
 
+@admin.register(ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
     list_display_links = None
     date_hierarchy = 'created'
 
 
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'current_cost', 'current_price')
     list_display_links = None
@@ -41,6 +46,7 @@ class ProductAdmin(admin.ModelAdmin):
     current_price.short_description = _('preço de venda atual')
 
 
+@admin.register(ProductsSale)
 class ProductsSaleAdmin(admin.ModelAdmin):
     list_display = ('company', 'product', 'category', 'sold', 'cost', 'price', 'total', 'month')
     list_filter = ('company', 'product__category', 'product')
@@ -66,9 +72,3 @@ class ProductsSaleAdmin(admin.ModelAdmin):
         return obj.price
 
     price.short_description = _('preço de venda')
-
-
-admin.site.register(Company, CompanyAdmin)
-admin.site.register(ProductCategory, ProductCategoryAdmin)
-admin.site.register(Product, ProductAdmin)
-admin.site.register(ProductsSale, ProductsSaleAdmin)
