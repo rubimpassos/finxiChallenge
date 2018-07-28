@@ -1,27 +1,30 @@
 from datetime import date, datetime
 
+from django.test import TestCase
+
+from salesmanagement.importer.factories import SalesImportFileFactory
 from salesmanagement.importer.models import SalesImportFile
-from salesmanagement.importer.tests import mock_storage, get_temporary_text_file, NoImportSalesSignalsTestCase
-from salesmanagement.manager.models import Company
+from salesmanagement.importer.tests import mock_storage
 
 
-class SalesImportFileModelTest(NoImportSalesSignalsTestCase):
-    def setUp(self):
-        super(SalesImportFileModelTest, self).setUpClass()
-        month = date.today().replace(day=1)
-
-        self.company = Company.objects.create(name='Company Name')
-        with mock_storage('sales_imported_files/FileName.xlsx'):
-            self.obj = SalesImportFile.objects.create(company=self.company,
-                                                      file=get_temporary_text_file("FileName.xlsx"),
-                                                      month=month)
+class SalesImportFileModelTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        with mock_storage('sales_imported_files/FileName_0.xlsx'):
+            cls.obj = SalesImportFileFactory.create()
 
     def test_create(self):
         self.assertTrue(SalesImportFile.objects.exists())
 
+    def test_company_field(self):
+        self.assertEqual('Company Name 0', self.obj.company.name)
+
     def test_month_field(self):
-        """SalesImportFile must have an auto created attr"""
         self.assertIsInstance(self.obj.month, date)
+
+    def test_file_field(self):
+        self.assertEqual('sales_imported_files/FileName_0.xlsx', self.obj.file.name)
 
     def test_created_field(self):
         """SalesImportFile must have an self-managed created attr"""
@@ -32,4 +35,4 @@ class SalesImportFileModelTest(NoImportSalesSignalsTestCase):
         self.assertIsInstance(self.obj.modified, datetime)
 
     def test_str(self):
-        self.assertEqual("sales_imported_files/FileName.xlsx", str(self.obj))
+        self.assertEqual("Registro de vendas da empresa Company Name 0 do mês de Julho de 2018", str(self.obj))

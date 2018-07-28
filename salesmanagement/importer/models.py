@@ -1,5 +1,6 @@
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.utils import formats
 from django_extensions.db.models import TimeStampedModel
 
 from salesmanagement.manager.models import Company
@@ -16,4 +17,8 @@ class SalesImportFile(TimeStampedModel):
         verbose_name_plural = 'Arquivos Importados'
 
     def __str__(self):
-        return self.file.name
+        month_year = formats.date_format(self.month, format="YEAR_MONTH_FORMAT", use_l10n=True)
+        return "Registro de vendas da empresa {company} do mês de {month_year}".format(
+            company=self.company.name,
+            month_year=month_year
+        )

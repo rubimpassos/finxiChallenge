@@ -136,3 +136,5 @@ CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND', default='amqp://localhost')
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+
+TEST_RUNNER = "salesmanagement.runner.PytestTestRunner"
