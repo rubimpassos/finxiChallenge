@@ -18,11 +18,15 @@ def import_sales_task(sale_file_pk):
         if company not in product.company.all():
             product.company.add(company)
 
-        ProductsSale.objects.create(
+        sold, cost, total = sale['sold'], sale['cost'], sale['total']
+        product_sale, result = ProductsSale.objects.get_or_create(
             company=company,
             product=product,
-            sold=sale['sold'],
-            cost=sale['cost'],
-            total=sale['total'],
             sale_month=sale_file.month,
+            defaults={'sold': sold, 'cost': cost, 'total': total}
         )
+
+        if not result:
+            product_sale.sold += sold
+            product_sale.total += total
+            product_sale.save()

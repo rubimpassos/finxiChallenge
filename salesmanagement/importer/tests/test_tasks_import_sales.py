@@ -2,12 +2,13 @@ from datetime import date
 from unittest.mock import patch, MagicMock
 
 from django.test import TestCase
+from djmoney.money import Money
 
 from salesmanagement.importer.factories import CompanyFactory
 from salesmanagement.importer.models import SalesImportFile
 from salesmanagement.importer.parser import ParserSalesXlsx
 from salesmanagement.importer.tasks import import_sales_task
-from salesmanagement.manager.models import Product, ProductCategory, ProductsSale, Company
+from salesmanagement.manager.models import Product, ProductCategory, ProductsSale
 
 
 class ImportSalesTaskTest(TestCase):
@@ -15,8 +16,12 @@ class ImportSalesTaskTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         parsed_xlsx = [
-            {'product': 'Product Low', 'category': 'Category A', 'sold': 9, 'cost': 4.70, 'total': 47.30},
-            {'product': 'Product High', 'category': 'Category B', 'sold': 5, 'cost': 3.20, 'total': 107.50}
+            {'product': 'Product Low', 'category': 'Category A', 'sold': 9, 'cost': Money(4.7, 'BRL'),
+             'total': Money(47.3, 'BRL')},
+            {'product': 'Product Low', 'category': 'Category A', 'sold': 7, 'cost': Money(5.70, 'BRL'),
+             'total': Money(90.30, 'BRL')},
+            {'product': 'Product High', 'category': 'Category B', 'sold': 5, 'cost': Money(3.2, 'BRL'),
+             'total': Money(107.5, 'BRL')}
         ]
         mock_attr = {
             'company': CompanyFactory.create(name='Company Name'),
@@ -45,3 +50,15 @@ class ImportSalesTaskTest(TestCase):
     def test_must_create_products_sale_with_values(self):
         """Must create 2 products sales with data values"""
         self.assertEqual(2, ProductsSale.objects.count())
+
+    def test_products_sale_sold_count(self):
+        """Must sum sold count if have repeated products"""
+        products = [('Product Low', 16), ('Product High', 5)]
+        sales = [(sale.product.name, sale.sold) for sale in ProductsSale.objects.all()]
+        self.assertEqual(products, sales)
+
+    def test_products_sale_total_count(self):
+        """Must sum total count if have repeated products"""
+        products = [('Product Low', Money(137.60, 'BRL')), ('Product High', Money(107.5, 'BRL'))]
+        sales = [(sale.product.name, sale.total) for sale in ProductsSale.objects.all()]
+        self.assertEqual(products, sales)
