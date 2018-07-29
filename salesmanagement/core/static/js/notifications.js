@@ -4,8 +4,7 @@ $(document).ready(function(){
         var url = $(this).data('remove-url');
         $.get(url).fail(function() {
             alert("Ocorreu algum erro, contate o administrador");
-        }).always(function() {
-            li.hide(100);
         });
+        li.hide(100);
     })
 });
