@@ -24,6 +24,8 @@
 5. Configure .env instance
 6. Run the tests
 
+FORKED_BY_MULTIPROCESSING
+rabbit-mq
 ```console
 git clone https://rubimpassos@bitbucket.org/rubimpassos/finxichallenge.git finxiChallenge
 cd finxiChallenge

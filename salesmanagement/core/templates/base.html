@@ -36,7 +36,13 @@
                 <nav class="nav-inline" role="navigation">
                     <a href="javascript:void(0);" class="nav-mobile"><i class="fa fa-bars"></i></a>
                     <ul>
-                        <li><a data-scroll href="{% url 'importer:sales-import' %}">Importar Vendas</a></li>
+                        {% if request.user.is_authenticated %}
+                            <li class="logged"><a href="#">Bem vindo, <span>{{ request.user.username }}</span>!</a></li>
+                            <li><a href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Login</a></li>
+                        {% endif %}
+                        <li><a href="{% url 'importer:sales-import' %}">Importar Vendas</a></li>
                         {% block top_menu %}{% endblock %}
                     </ul>
                 </nav>

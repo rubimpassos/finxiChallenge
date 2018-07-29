@@ -171,6 +171,16 @@ section header h2 {
     overflow: hidden;
 }
 
+.logged a{
+    text-transform: none !important;
+    pointer-events: none;
+    cursor: default;
+}
+
+.logged a span{
+    text-transform: capitalize !important;
+}
+
 
 @media all and (min-width:900px) {
 

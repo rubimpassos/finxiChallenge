@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+    <section>
+        <div class="content row padding-bottom-3 desktop-12 container">
+            <h1>Login</h1>
+            {% if messages %}
+              <ul class="messages">
+                {% for message in messages %}
+                  <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            <div class="desktop-6">
+                <form novalidate method="post">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="form-row label-block input-text">
+                        <label for="{{ form.username.id_for_label }}">{{ form.username.label }}</label>
+                        {{ form.username.errors }}
+                        {{ form.username }}
+                    </div>
+                    <div class="form-row label-block input-text">
+                        <label for="{{ form.password.id_for_label }}">{{ form.password.label }}</label>
+                        {{ form.password.errors }}
+                        {{ form.password }}
+                    </div>
+                    <p class="btn-row"><input type="submit" value="Login"/></p>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
