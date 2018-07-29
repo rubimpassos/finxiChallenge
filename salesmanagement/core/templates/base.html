@@ -1,4 +1,5 @@
 {% load static %}
+{% load notifications_tags %}
 <!DOCTYPE html>
 <html>
 	<head>
@@ -50,8 +51,23 @@
             </header>
         </div>
 
+        {% if request.user.is_authenticated %}
+            {% if notifications %}
+                <div class="row desktop-12 container">
+                    <ul id="notifications">
+                        {% for notification in notifications %}
+                            <li>{{ notification.verb }} - <button data-remove-url="{% url 'notifications:mark_as_read' notification.slug %}">X</button></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endif %}
         <!-- OVERVIEW -->
         {% block content %}{% endblock %}
     </body>
+    <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+    {% if request.user.is_authenticated %}
+    <script src="{% static 'js/notifications.js' %}"></script>
+    {% endif %}
     {% block js %}{% endblock %}
 </html>

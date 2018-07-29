@@ -376,4 +376,8 @@ section header h2 {
     border-color: #d0e9c6;
 }
 
+#notifications{
+    padding: 0 !important;
+    margin: 0 !important;
+}
 /* Fim Customização */
