@@ -14,6 +14,7 @@
                 <form action="." novalidate method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form.non_field_errors }}
+                    <input type="hidden" name="{{ form.user.html_name }}" id="{{ form.user.auto_id }}" value="{{ request.user.pk }}">
                     <div class="form-row label-block input-text">
                         <label for="{{ form.company.id_for_label }}">{{ form.company.label }}</label>
                         {{ form.company.errors }}

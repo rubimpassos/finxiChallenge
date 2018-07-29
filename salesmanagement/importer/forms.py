@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.forms import ModelForm, CharField
+from django.forms import ModelForm, CharField, HiddenInput
 from django.forms.widgets import DateInput
 from django.utils import formats
 from django.utils.translation import ugettext_lazy as _
@@ -13,9 +13,10 @@ class SalesImportForm(ModelForm):
 
     class Meta:
         model = SalesImportFile
-        fields = ('month', 'file')
+        fields = ('user', 'month', 'file')
         widgets = {
-            'month': DateInput(attrs={'type': 'date'})
+            'month': DateInput(attrs={'type': 'date'}),
+            'user': HiddenInput()
         }
 
     def clean_company(self):

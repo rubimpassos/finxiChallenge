@@ -1,5 +1,6 @@
 from datetime import date, datetime
 
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from salesmanagement.importer.factories import SalesImportFileFactory
@@ -16,6 +17,9 @@ class SalesImportFileModelTest(TestCase):
 
     def test_create(self):
         self.assertTrue(SalesImportFile.objects.exists())
+
+    def test_user_field(self):
+        self.assertIsInstance(self.obj.user, get_user_model())
 
     def test_company_field(self):
         self.assertEqual('Company Name 0', self.obj.company.name)
@@ -35,4 +39,4 @@ class SalesImportFileModelTest(TestCase):
         self.assertIsInstance(self.obj.modified, datetime)
 
     def test_str(self):
-        self.assertEqual("Registro de vendas da empresa Company Name 0 do mês de Julho de 2018", str(self.obj))
+        self.assertEqual("Registro de vendas de Company Name 0 no mês de Julho de 2018", str(self.obj))

@@ -7,6 +7,7 @@ from django.shortcuts import resolve_url as r
 from django.test import TestCase
 from factory.django import mute_signals
 
+from salesmanagement.core.factories import RandomUserFactory
 from salesmanagement.importer.factories import SalesImportFileFactory, CompanyFactory
 from salesmanagement.importer.forms import SalesImportForm
 from salesmanagement.importer.models import SalesImportFile
@@ -14,8 +15,10 @@ from salesmanagement.importer.tests import get_temporary_text_file, mock_storage
 from salesmanagement.manager.models import Company
 
 
-class SalesImportViewGet(TestCase):
+class SalesImportViewGetValid(TestCase):
     def setUp(self):
+        user = RandomUserFactory(password='pass')
+        self.client.login(username=user.username, password='pass')
         self.response = self.client.get(r('importer:sales-import'))
 
     def test_get(self):
@@ -30,7 +33,8 @@ class SalesImportViewGet(TestCase):
         """Html must contain specific input tags"""
         tags = (('<form', 1),
                 ('enctype="multipart/form-data"', 1),
-                ('<input', 5),
+                ('<input', 6),
+                ('type="hidden"', 1),
                 ('type="text"', 1),
                 ('type="date"', 1),
                 ('type="file"', 1),
@@ -50,10 +54,23 @@ class SalesImportViewGet(TestCase):
         self.assertIsInstance(form, SalesImportForm)
 
 
+class SalesImportViewGetInvalid(TestCase):
+    def setUp(self):
+        self.response = self.client.get(r('importer:sales-import'))
+
+    def test_get(self):
+        """Must redirect to login page with next param"""
+        expected = "{}?next={}".format(r('login'), r('importer:sales-import'))
+        self.assertRedirects(self.response, expected)
+
+
 class SalesImportViewPostValid(TestCase):
     def setUp(self):
+        user = RandomUserFactory(password='pass')
+        self.client.login(username=user.username, password='pass')
         file_path = Path('sales_imported_files/FileName.xlsx')
-        data = dict(company='Company Name', month='01/07/2018', file=get_temporary_text_file(file_path.name))
+        data = dict(user=user.pk, company='Company Name', month='01/07/2018',
+                    file=get_temporary_text_file(file_path.name))
         with mock_storage(file_path.as_posix()), mute_signals(signals.post_save):
             self.response = self.client.post(r('importer:sales-import'), data)
 
@@ -61,7 +78,8 @@ class SalesImportViewPostValid(TestCase):
         """Must redirect to same page"""
         self.assertRedirects(self.response, r('importer:sales-import'))
 
-    def test_company(self):
+    def test_company_create(self):
+        """Must create company if not exists"""
         self.assertTrue(Company.objects.exists())
 
     def test_sales_file(self):
@@ -76,6 +94,8 @@ class SalesImportViewPostValid(TestCase):
 
 class SalesImportViewPostInvalid(TestCase):
     def setUp(self):
+        user = RandomUserFactory(password='pass')
+        self.client.login(username=user.username, password='pass')
         self.response = self.client.post(r('importer:sales-import'), {})
 
     def test_post(self):
@@ -97,8 +117,11 @@ class SalesImportViewPostInvalid(TestCase):
 
 class SalesImportViewPostInvalidExtension(TestCase):
     def setUp(self):
-        file_path = Path('sales_imported_files/FileName.jpg')
-        data = dict(company='Company Name', month='01/07/2018', file=get_temporary_text_file(file_path.name))
+        user = RandomUserFactory(password='pass')
+        file = get_temporary_text_file('FileName.jpg')
+        data = dict(user=user.pk, company='Company Name', month='01/07/2018', file=file)
+
+        self.client.login(username=user.username, password='pass')
         self.response = self.client.post(r('importer:sales-import'), data)
 
     def test_post(self):
@@ -135,11 +158,13 @@ class SalesImportViewPostInvalidExtension(TestCase):
 
 class SalesImportViewPostInvalidMounth(TestCase):
     def setUp(self):
+        user = RandomUserFactory(password='pass')
         company = CompanyFactory.create(name='Company Name')
         month = date(day=1, month=7, year=2018)
         file = get_temporary_text_file("FileName.xlsx")
-        data = dict(company='Company Name', month='01/07/2018', file=file)
+        data = dict(user=user.pk, company='Company Name', month='01/07/2018', file=file)
 
+        self.client.login(username=user.username, password='pass')
         with mock_storage('sales_imported_files/FileName.xlsx'), mute_signals(signals.post_save):
             self.obj = SalesImportFileFactory.create(company=company, month=month)
             self.response = self.client.post(r('importer:sales-import'), data)
