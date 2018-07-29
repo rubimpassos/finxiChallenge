@@ -3,6 +3,7 @@ from unittest.mock import patch, MagicMock
 
 from django.test import TestCase
 from djmoney.money import Money
+from django.utils.translation import gettext as _
 
 from salesmanagement.importer.factories import CompanyFactory
 from salesmanagement.importer.models import SalesImportFile
@@ -30,8 +31,11 @@ class ImportSalesTaskTest(TestCase):
         }
         patcher_get = patch.object(SalesImportFile.objects, 'get', return_value=MagicMock(**mock_attr))
         patcher_parser = patch.object(ParserSalesXlsx, 'as_data', return_value=parsed_xlsx)
+        pathcer_notify = patch("salesmanagement.importer.tasks.notify", return_value=MagicMock(send=MagicMock()))
 
-        with patcher_get, patcher_parser:
+        with patcher_get as mock_sale, patcher_parser, pathcer_notify as mock_notify:
+            cls.mock_sale = mock_sale()
+            cls.mock_notify = mock_notify
             import_sales_task(1)
 
     def test_must_create_product_categories(self):
@@ -62,3 +66,8 @@ class ImportSalesTaskTest(TestCase):
         products = [('Product Low', Money(137.60, 'BRL')), ('Product High', Money(107.5, 'BRL'))]
         sales = [(sale.product.name, sale.total) for sale in ProductsSale.objects.all()]
         self.assertEqual(products, sales)
+
+    def test_send_notification(self):
+        """Must send notification with args"""
+        self.mock_notify.send.assert_called_once_with(self.mock_sale, recipient=self.mock_sale.user,
+                                                      verb=_("foi importado"))
