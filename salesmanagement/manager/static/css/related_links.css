@@ -1,0 +1,19 @@
+.list_filter_link{
+    text-decoration: none !important;
+    background: #79aec8;
+    padding: 10px 15px;
+    margin-left: 5px;
+    border: none;
+    border-radius: 4px;
+    color: #fff !important;
+    cursor: pointer;
+}
+
+.list_filter_link:active {
+    text-decoration: none !important;
+}
+
+.list_filter_link:hover {
+    text-decoration: none !important;
+    background: #609ab6;
+}

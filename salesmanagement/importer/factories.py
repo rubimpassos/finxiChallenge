@@ -6,15 +6,7 @@ from factory.django import DjangoModelFactory
 
 from salesmanagement.core.factories import RandomUserFactory
 from salesmanagement.importer.models import SalesImportFile
-from salesmanagement.manager.models import Company
-
-
-@factory.django.mute_signals(signals.pre_save, signals.post_save)
-class CompanyFactory(DjangoModelFactory):
-    class Meta:
-        model = Company
-
-    name = factory.Sequence(lambda n: "Company Name %d" % n)
+from salesmanagement.manager.factories import CompanyFactory
 
 
 @factory.django.mute_signals(signals.pre_save, signals.post_save)

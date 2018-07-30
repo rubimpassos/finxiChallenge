@@ -5,7 +5,7 @@ from django.test import TestCase
 from djmoney.money import Money
 from django.utils.translation import gettext as _
 
-from salesmanagement.importer.factories import CompanyFactory
+from salesmanagement.manager.factories import CompanyFactory
 from salesmanagement.importer.models import SalesImportFile
 from salesmanagement.importer.parser import ParserSalesXlsx
 from salesmanagement.importer.tasks import import_sales_task

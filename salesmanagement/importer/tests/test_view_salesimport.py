@@ -8,7 +8,8 @@ from django.test import TestCase
 from factory.django import mute_signals
 
 from salesmanagement.core.factories import RandomUserFactory
-from salesmanagement.importer.factories import SalesImportFileFactory, CompanyFactory
+from salesmanagement.importer.factories import SalesImportFileFactory
+from salesmanagement.manager.factories import CompanyFactory
 from salesmanagement.importer.forms import SalesImportForm
 from salesmanagement.importer.models import SalesImportFile
 from salesmanagement.importer.tests import get_temporary_text_file, mock_storage

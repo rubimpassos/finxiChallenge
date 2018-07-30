@@ -1,5 +1,8 @@
 from django.contrib import admin
+from django.db.models import Sum
+from django.urls import reverse
 from django.utils import formats
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from salesmanagement.manager.inlines import ProducSalesInline, CompanyProductsInline
@@ -10,8 +13,59 @@ admin.site.site_header = _('Administração')
 
 @admin.register(Company)
 class CompanyAdmin(admin.ModelAdmin):
-    inlines = [CompanyProductsInline]
+    fields = ('name', 'products_count', 'sold_products', 'best_seller', 'related_links')
+    readonly_fields = ('products_count', 'sold_products', 'best_seller', 'related_links')
+    fields_related_links = ('related_link_products', 'related_link_sales')
     date_hierarchy = 'created'
+
+    class Media:
+        css = {
+            "all": ("css/related_links.css",)
+        }
+
+    def products_count(self, obj):
+        return obj.product_set.count()
+
+    products_count.short_description = _('quantidade de produtos')
+
+    def sold_products(self, obj):
+        q = obj.productssale_set.all().aggregate(sold_count=Sum('sold'))
+        return q['sold_count'] or 0
+
+    sold_products.short_description = _('total de produtos vendidos')
+
+    def best_seller(self, obj):
+        product = obj.productssale_set.values('product').distinct().annotate(sold=Sum('sold')).latest('sold')
+        product = Product.objects.get(pk=product['product'])
+        url = reverse('admin:manager_product_change', args=(product.pk,))
+        return mark_safe('<a href="{}">{}</a>'.format(url, product))
+
+    best_seller.short_description = _('produto mais vendido')
+
+    def related_links(self, obj):
+        links = ''
+        for f in self.fields_related_links:
+            m = getattr(self, f, lambda n: '')
+            links += m(obj)
+
+        return mark_safe(links)
+
+    related_links.short_description = _('relacionados')
+    related_links.allow_tags = True
+
+    @staticmethod
+    def related_link_products(obj):
+        url = reverse('admin:manager_product_changelist')
+        lookup = f"company__id__exact={obj.pk}"
+        text = "Produtos"
+        return f'<a class="list_filter_link" href="{url}?{lookup}">{text}</a>'
+
+    @staticmethod
+    def related_link_sales(obj):
+        url = reverse('admin:manager_productssale_changelist')
+        lookup = f"company__id__exact={obj.pk}"
+        text = "Vendas"
+        return f'<a class="list_filter_link" href="{url}?{lookup}">{text}</a>'
 
 
 @admin.register(ProductCategory)
