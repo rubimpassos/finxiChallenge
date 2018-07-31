@@ -54,7 +54,7 @@ class CompanyAdminTest(TestCase):
         """
         self.add_products_and_sales()
         link = self.admin.best_seller(self.company)
-        self.assertIn('<a href=', link)
+        self.assertIn('<a class="model_change_link" href=', link)
         self.assertIn('change', link)
         self.assertIn(f'?_changelist_filters=company__id__exact%3D{self.company.pk}', link)
         self.assertIn(str(self.products[0]), link)

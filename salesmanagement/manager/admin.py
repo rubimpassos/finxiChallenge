@@ -7,7 +7,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from salesmanagement.manager.inlines import ProductSalesInline, CompanyProductsInline
+from salesmanagement.manager.inlines import ProductSalesInline
 from salesmanagement.manager.models import Company, Product, ProductCategory, ProductsSale
 
 admin.site.site_header = _('Administração')
@@ -29,7 +29,6 @@ class ChangeListCustomLookup(ChangeList):
 
 class ModelAdminCompanyFilter(admin.ModelAdmin):
     request = None
-    changelist_instance = None
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         self.request = request
@@ -94,10 +93,8 @@ class CompanyAdmin(admin.ModelAdmin):
     def best_seller(self, obj):
         product = obj.productssale_set.values('product').distinct().annotate(sold=Sum('sold')).latest('sold')
         product = Product.objects.get(pk=product['product'])
-        url = reverse('admin:manager_product_change', args=(product.pk,))
-        filters = f'company__id__exact={obj.pk}'
-        url += '?'+urlencode({'_changelist_filters': filters})
-        return mark_safe(f'<a href="{url}">{product}</a>')
+        link = self.admin_link(obj, 'product', 'change', product, class_='model_change_link', args=(product.pk,))
+        return mark_safe(link)
 
     best_seller.short_description = _('produto mais vendido')
 
@@ -112,19 +109,23 @@ class CompanyAdmin(admin.ModelAdmin):
     related_links.short_description = _('relacionados')
     related_links.allow_tags = True
 
-    @staticmethod
-    def related_link_products(obj):
-        url = reverse('admin:manager_product_changelist')
-        lookup = f'company__id__exact={obj.pk}&_disable_filters=company'
-        text = _('Produtos')
-        return f'<a class="list_filter_link" href="{url}?{lookup}">{text}</a>'
+    def related_link_products(self, obj):
+        return self.admin_link(obj, 'product', 'changelist', _('Produtos'), disable_company=True)
+
+    def related_link_sales(self, obj):
+        return self.admin_link(obj, 'productssale', 'changelist', _('Vendas'), disable_company=True)
 
     @staticmethod
-    def related_link_sales(obj):
-        url = reverse('admin:manager_productssale_changelist')
-        lookup = f'company__id__exact={obj.pk}&_disable_filters=company'
-        text = _('Vendas')
-        return f'<a class="list_filter_link" href="{url}?{lookup}">{text}</a>'
+    def admin_link(obj, model, view, text, disable_company=False, class_='list_filter_link', args=None):
+        filters = f'company__id__exact={obj.pk}'
+        if disable_company:
+            filters += '&_disable_filters=company'
+
+        if view == 'change':
+            filters = urlencode({'_changelist_filters': filters})
+
+        url = reverse(f'admin:manager_{model}_{view}', args=args)
+        return f'<a class="{class_}" href="{url}?{filters}">{text}</a>'
 
 
 @admin.register(ProductCategory)
@@ -141,6 +142,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 class ProductAdmin(ModelAdminCompanyFilter):
     list_display = ('name', 'category', 'current_cost', 'current_price')
     list_filter = ('company', 'category', 'name')
+    list_select_related = ('category',)
     fields = list_display
     readonly_fields = list_display
     search_fields = ('name', 'category__name')
