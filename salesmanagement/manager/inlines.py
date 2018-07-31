@@ -19,13 +19,13 @@ class CompanyProductsInline(admin.TabularInline):
 
     def product_link(self, obj):
         url = reverse('admin:manager_product_change', args=(obj.product.pk,))
-        return mark_safe('<a href="{}">{}</a>'.format(url, obj.product))
+        return mark_safe(f'<a href="{url}">{obj.product}</a>')
 
     product_link.short_description = _('produto')
 
     def category(self, obj):
         url = reverse('admin:manager_productcategory_change', args=(obj.product.category.pk,))
-        return mark_safe('<a href="{}">{}</a>'.format(url, obj.product.category))
+        return mark_safe(f'<a href="{url}">{obj.product.category}</a>')
 
     category.short_description = _('categoria')
 

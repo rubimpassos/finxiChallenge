@@ -38,7 +38,7 @@ class SalesImportForm(ModelForm):
         files = SalesImportFile.objects.filter(month__month=month.month, month__year=month.year, company=company)
         if files.exists():
             date = formats.date_format(month, format="YEAR_MONTH_FORMAT", use_l10n=True)
-            raise ValidationError(_('O arquivo do mês de {} já foi importado para {}'.format(date, company)))
+            raise ValidationError(_(f'O arquivo do mês de {date} já foi importado para {company}'))
 
         return cleaned_data
 
