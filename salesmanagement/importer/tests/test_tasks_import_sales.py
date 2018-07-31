@@ -5,6 +5,8 @@ from django.test import TestCase
 from djmoney.money import Money
 from django.utils.translation import gettext as _
 
+from salesmanagement.importer.factories import SalesImportFileFactory
+from salesmanagement.importer.tests import mock_storage
 from salesmanagement.manager.factories import CompanyFactory
 from salesmanagement.importer.models import SalesImportFile
 from salesmanagement.importer.parser import ParserSalesXlsx
@@ -12,7 +14,7 @@ from salesmanagement.importer.tasks import import_sales_task
 from salesmanagement.manager.models import Product, ProductCategory, ProductsSale
 
 
-class ImportSalesTaskTest(TestCase):
+class ImportSalesTaskSuccessTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -24,19 +26,19 @@ class ImportSalesTaskTest(TestCase):
             {'product': 'Product High', 'category': 'Category B', 'sold': 5, 'cost': Money(3.2, 'BRL'),
              'total': Money(107.5, 'BRL')}
         ]
-        mock_attr = {
-            'company': CompanyFactory.create(name='Company Name'),
-            'month': date(day=1, month=7, year=2018),
-            'file.path': 'FileName.xlsx'
-        }
-        patcher_get = patch.object(SalesImportFile.objects, 'get', return_value=MagicMock(**mock_attr))
-        patcher_parser = patch.object(ParserSalesXlsx, 'as_data', return_value=parsed_xlsx)
-        pathcer_notify = patch("salesmanagement.importer.tasks.notify", return_value=MagicMock(send=MagicMock()))
 
-        with patcher_get as mock_sale, patcher_parser, pathcer_notify as mock_notify:
-            cls.mock_sale = mock_sale()
-            cls.mock_notify = mock_notify
-            import_sales_task(1)
+        patcher_parser = patch.object(ParserSalesXlsx, 'as_data', return_value=parsed_xlsx)
+        patcher_storage = mock_storage('sales_imported_files/FileName.xlsx')
+        notify_patcher = patch("salesmanagement.importer.models.notify", return_value=MagicMock(send=MagicMock()))
+
+        with patcher_storage, patcher_parser, notify_patcher:
+            cls.sale_file = SalesImportFileFactory.create(company__name='Company Name')
+            import_sales_task(cls.sale_file.pk)
+
+    def test_status_imported(self):
+        """Must set status field to IMPORTED"""
+        self.sale_file = SalesImportFile.objects.get(pk=self.sale_file.pk)
+        self.assertEqual(SalesImportFile.IMPORTED, self.sale_file.status)
 
     def test_must_create_product_categories(self):
         """Must create 2 product categories"""
@@ -67,7 +69,20 @@ class ImportSalesTaskTest(TestCase):
         sales = [(sale.product.name, sale.total) for sale in ProductsSale.objects.all()]
         self.assertEqual(products, sales)
 
-    def test_send_notification(self):
-        """Must send notification with args"""
-        self.mock_notify.send.assert_called_once_with(self.mock_sale, recipient=self.mock_sale.user,
-                                                      verb=_("foi importado"))
+
+class ImportSalesTaskFailTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        patcher_parser = patch.object(ParserSalesXlsx, 'as_data', return_value=[])
+        patcher_storage = mock_storage('sales_imported_files/FileName.xlsx')
+        notify_patcher = patch("salesmanagement.importer.models.notify", return_value=MagicMock(send=MagicMock()))
+
+        with patcher_storage, patcher_parser, notify_patcher:
+            cls.sale_file = SalesImportFileFactory.create(company__name='Company Name')
+            import_sales_task(cls.sale_file.pk)
+
+    def test_status_imported(self):
+        """Must set status field to ERROR"""
+        self.sale_file = SalesImportFile.objects.get(pk=self.sale_file.pk)
+        self.assertEqual(SalesImportFile.ERROR, self.sale_file.status)

@@ -17,4 +17,4 @@ class SalesImportFileFactory(DjangoModelFactory):
     user = factory.SubFactory(RandomUserFactory)
     company = factory.SubFactory(CompanyFactory)
     month = date(day=1, month=7, year=2018)
-    file = factory.django.FileField(data='data', filename=factory.Sequence(lambda n: "FileName_%d.xlsx" % n))
+    file = factory.django.FileField(data='data', filename='FileName.xlsx')
