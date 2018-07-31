@@ -18,13 +18,18 @@ class ParserSalesXlsx:
 
         for i, row in enumerate(ws.rows):
             if len(row) != self.max_columns:
-                raise ValueError('File columns are inconsistent!')
+                return []
 
             if i == 0:
                 # skip file header
                 continue
 
-            data.append(self.get_row_dict(row))
+            try:
+                d = self.get_row_dict(row)
+            except Exception:
+                return []
+
+            data.append(d)
 
         return data
 
@@ -55,7 +60,10 @@ class ParserSalesXlsx:
         return self.parse_currency(total_string)
 
     @staticmethod
-    def parse_currency(currency_string):
-        n = currency_string.replace('R$', '').strip()
+    def parse_currency(currency):
+        if isinstance(currency, float):
+            return Money(currency, 'BRL')
+
+        n = str(currency).replace('R$', '').strip()
         locale.setlocale(locale.LC_ALL, 'Portuguese_Brazil.1252')
         return Money(locale.atof(n), 'BRL')
