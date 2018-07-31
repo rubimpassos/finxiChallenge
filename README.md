@@ -24,8 +24,8 @@
 5. Configure .env instance
 6. Run the tests
 
-FORKED_BY_MULTIPROCESSING
-rabbit-mq
+OBS: If you are on windows I recomend you to use rabbit-mq for work with celery, and you must set FORKED_BY_MULTIPROCESSING=1 var environment else celery do not work
+
 ```console
 git clone https://rubimpassos@bitbucket.org/rubimpassos/finxichallenge.git finxiChallenge
 cd finxiChallenge
@@ -33,7 +33,7 @@ python -m venv .venv
 source .venv/Scripts/activate.bat
 pip install -r requirements-dev.txt
 cp contrib/env-sample .env
-python -m pytest
+python -m pytest -rsx
 ```
 
 ## Deployment
