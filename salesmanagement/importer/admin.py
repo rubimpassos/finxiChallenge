@@ -31,5 +31,8 @@ class SalesFileAdmin(admin.ModelAdmin):
     imported.short_description = _('foi importado')
     imported.boolean = True
 
+    def has_add_permission(self, request):
+        return False
+
 
 admin.site.register(SalesImportFile, SalesFileAdmin)

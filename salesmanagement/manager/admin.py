@@ -206,3 +206,6 @@ class ProductsSaleAdmin(ModelAdminCompanyFilter):
         return obj.price
 
     price.short_description = _('preço de venda')
+
+    def has_add_permission(self, request):
+        return False
