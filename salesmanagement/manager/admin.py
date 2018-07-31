@@ -1,14 +1,71 @@
 from django.contrib import admin
+from django.contrib.admin.views.main import ChangeList
 from django.db.models import Sum
 from django.urls import reverse
 from django.utils import formats
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from salesmanagement.manager.inlines import ProducSalesInline, CompanyProductsInline
+from salesmanagement.manager.inlines import ProductSalesInline, CompanyProductsInline
 from salesmanagement.manager.models import Company, Product, ProductCategory, ProductsSale
 
 admin.site.site_header = _('Administração')
+
+
+class ChangeListCustomLookup(ChangeList):
+    ignore_lookups = ('_disable_filters',)
+
+    def get_filters_params(self, params=None, skipp_ignore=False):
+        lookup_params = super().get_filters_params(params=params)
+        if skipp_ignore:
+            return lookup_params
+
+        for ignored in self.ignore_lookups:
+            if ignored in lookup_params:
+                del lookup_params[ignored]
+        return lookup_params
+
+
+class ModelAdminCompanyFilter(admin.ModelAdmin):
+    request = None
+    changelist_instance = None
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        self.request = request
+        return super().change_view(request, object_id, form_url=form_url, extra_context=extra_context)
+
+    def changelist_view(self, request, extra_context=None):
+        self.request = request
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def get_changelist(self, request, **kwargs):
+        return ChangeListCustomLookup
+
+    def get_queryset(self, request):
+        q = super().get_queryset(request)
+        company_id = self.get_company_id()
+        if company_id is None:
+            return q
+
+        return q.filter(company__id__exact=company_id)
+
+    def get_list_filter(self, request):
+        d_filters = self.request.GET.get('_disable_filters', [])
+        list_filter = [f for f in self.list_filter if f not in d_filters]
+        return list_filter
+
+    def get_company_id(self):
+        company_id = self.request.GET.get('company__id__exact')
+        if company_id:
+            return company_id
+
+        changelist_filters = self.request.GET.get('_changelist_filters')
+        lookup_filters = {}
+        if changelist_filters:
+            lookup_filters = dict(param.split('=') for param in changelist_filters.split('&'))
+
+        return lookup_filters.get('company__id__exact')
 
 
 @admin.register(Company)
@@ -38,7 +95,9 @@ class CompanyAdmin(admin.ModelAdmin):
         product = obj.productssale_set.values('product').distinct().annotate(sold=Sum('sold')).latest('sold')
         product = Product.objects.get(pk=product['product'])
         url = reverse('admin:manager_product_change', args=(product.pk,))
-        return mark_safe('<a href="{}">{}</a>'.format(url, product))
+        filters = f'company__id__exact={obj.pk}'
+        url += '?'+urlencode({'_changelist_filters': filters})
+        return mark_safe(f'<a href="{url}">{product}</a>')
 
     best_seller.short_description = _('produto mais vendido')
 
@@ -56,15 +115,15 @@ class CompanyAdmin(admin.ModelAdmin):
     @staticmethod
     def related_link_products(obj):
         url = reverse('admin:manager_product_changelist')
-        lookup = f"company__id__exact={obj.pk}"
-        text = "Produtos"
+        lookup = f'company__id__exact={obj.pk}&_disable_filters=company'
+        text = _('Produtos')
         return f'<a class="list_filter_link" href="{url}?{lookup}">{text}</a>'
 
     @staticmethod
     def related_link_sales(obj):
         url = reverse('admin:manager_productssale_changelist')
-        lookup = f"company__id__exact={obj.pk}"
-        text = "Vendas"
+        lookup = f'company__id__exact={obj.pk}&_disable_filters=company'
+        text = _('Vendas')
         return f'<a class="list_filter_link" href="{url}?{lookup}">{text}</a>'
 
 
@@ -74,35 +133,50 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     list_display_links = None
     date_hierarchy = 'created'
 
+    class Media:
+        js = ('js/list_filter_collapse.js',)
+
 
 @admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(ModelAdminCompanyFilter):
     list_display = ('name', 'category', 'current_cost', 'current_price')
-    list_display_links = None
-    list_filter = ('category', 'name', )
-    readonly_fields = list_display+('company',)
+    list_filter = ('company', 'category', 'name')
+    fields = list_display
+    readonly_fields = list_display
     search_fields = ('name', 'category__name')
     date_hierarchy = 'created'
-    inlines = [ProducSalesInline]
+    inlines = [ProductSalesInline]
+
+    class Media:
+        js = ('js/list_filter_collapse.js',)
 
     def current_cost(self, obj):
         """Get last manufacturing cost in the month"""
-        last_sale = obj.productssale_set.last()
-        return getattr(last_sale, 'cost', '')
+        q = self.get_productssale_for_company(obj).last()
+        return getattr(q, 'cost', '')
 
     current_cost.short_description = _('custo atual')
 
     def current_price(self, obj):
         """Get last sale price in the month"""
-        last_sale = obj.productssale_set.last()
-        return getattr(last_sale, 'price', '')
+        q = self.get_productssale_for_company(obj).last()
+        return getattr(q, 'price', '')
 
     current_price.short_description = _('preço de venda atual')
 
+    def get_productssale_for_company(self, obj):
+        company_id = self.get_company_id()
+        q = obj.productssale_set.all()
+        if company_id:
+            q = q.filter(company=company_id)
+
+        return q
+
 
 @admin.register(ProductsSale)
-class ProductsSaleAdmin(admin.ModelAdmin):
-    list_display = ('company', 'product', 'category', 'sold', 'cost', 'price', 'total', 'month')
+class ProductsSaleAdmin(ModelAdminCompanyFilter):
+    list_display = ('company', 'product', 'category', 'sold', 'cost', 'price', 'total', 'month_year')
+    readonly_fields = list_display
     list_filter = ('company', 'product__category', 'product')
     list_display_links = None
     search_fields = ('company__name', 'product__name', 'product__category__name', 'sold', 'cost', 'sale_month')
@@ -116,11 +190,11 @@ class ProductsSaleAdmin(admin.ModelAdmin):
 
     category.short_description = _('categoria')
 
-    def month(self, obj):
+    def month_year(self, obj):
         month_year = formats.date_format(obj.sale_month, format="YEAR_MONTH_FORMAT", use_l10n=True)
         return month_year
 
-    month.short_description = _('mês')
+    month_year.short_description = _('mês')
 
     def price(self, obj):
         return obj.price

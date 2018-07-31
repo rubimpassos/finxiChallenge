@@ -31,7 +31,7 @@ class ProductCategory(TimeStampedModel):
 class Product(TimeStampedModel):
     name = models.CharField(_('nome'), max_length=255)
     category = models.ForeignKey(ProductCategory, verbose_name=_('categoria'), on_delete=models.CASCADE)
-    company = models.ManyToManyField(Company, verbose_name=_('Empresa'))
+    company = models.ManyToManyField(Company, verbose_name=_('Empresas'))
 
     class Meta:
         verbose_name = 'produto'
@@ -55,11 +55,7 @@ class ProductsSale(TimeStampedModel):
 
     def __str__(self):
         month_year = formats.date_format(self.sale_month, format="YEAR_MONTH_FORMAT", use_l10n=True)
-        return "[{company}]Vendas de {product} em {month_year}".format(
-            company=self.company.name,
-            product=self.product.name,
-            month_year=month_year
-        )
+        return f'[{self.company}]Vendas de {self.product} em {month_year}'
 
     @property
     def price(self):
@@ -68,4 +64,3 @@ class ProductsSale(TimeStampedModel):
         if not sold:
             return 0
         return Money(self.total.amount/sold, 'BRL')
-

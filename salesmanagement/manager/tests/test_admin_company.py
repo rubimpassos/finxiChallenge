@@ -36,7 +36,7 @@ class CompanyAdminTest(TestCase):
 
     def test_sold_products_result(self):
         """Must return sold products count from company"""
-        self.add_produts_and_sales()
+        self.add_products_and_sales()
         self.assertEqual(29, self.admin.sold_products(self.company))
 
     def test_sold_products_result_when_no_sales(self):
@@ -52,10 +52,11 @@ class CompanyAdminTest(TestCase):
         """Must return best seller product url from company
         the priority is decided by the product that was first best seller, in case of tie
         """
-        self.add_produts_and_sales()
+        self.add_products_and_sales()
         link = self.admin.best_seller(self.company)
         self.assertIn('<a href=', link)
         self.assertIn('change', link)
+        self.assertIn(f'?_changelist_filters=company__id__exact%3D{self.company.pk}', link)
         self.assertIn(str(self.products[0]), link)
 
     def test_related_links_field(self):
@@ -99,7 +100,7 @@ class CompanyAdminTest(TestCase):
     def add_products(self):
         self.products = ProductFactory.create_batch(3, companies=(self.company,))
 
-    def add_produts_and_sales(self):
+    def add_products_and_sales(self):
         self.add_products()
         month_june = date(day=1, month=6, year=2018)
         month_july = date(day=1, month=7, year=2018)
@@ -116,10 +117,10 @@ class CompanyAdminTest(TestCase):
                       dict(product=self.products[2], sold=1, cost=Money(1.99, 'BRL'), total=Money(6.3, 'BRL'),
                            sale_month=month_july),)
         self.sales = []
-        print(self.products)
         for params in sales_data:
             self.sales.append(ProductsSaleFactory(company=self.company, **params))
 
     def match_related_links(self, links):
-        regex = fr'<a class="list_filter_link" href="(.*)\?company__id__exact={self.company.pk}'
+        regex = fr'<a class="list_filter_link" href="(.*)\?company__id__exact={self.company.pk}' \
+                fr'&_disable_filters=company'
         return re.findall(regex, links)

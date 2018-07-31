@@ -15,6 +15,7 @@ class CompanyProductsInline(admin.TabularInline):
     fields = ('product_link', 'category', 'current_cost', 'current_price')
     readonly_fields = fields
     can_delete = False
+    classes = ('collapse',)
 
     def product_link(self, obj):
         url = reverse('admin:manager_product_change', args=(obj.product.pk,))
@@ -52,25 +53,47 @@ class CompanyProductsInline(admin.TabularInline):
         return False
 
 
-class ProducSalesInline(admin.TabularInline):
+class ProductSalesInline(admin.TabularInline):
     model = ProductsSale
     extra = 0
     verbose_name = "Venda"
     verbose_name_plural = "Vendas"
-    fields = ('sold', 'cost', 'price', 'total', 'month')
+    fields = ('company', 'sold', 'cost', 'price', 'total', 'month_year')
     readonly_fields = fields
     can_delete = False
+    request = None
 
     def price(self, obj):
         return obj.price
 
     price.short_description = _('preço de venda')
 
-    def month(self, obj):
+    def month_year(self, obj):
         month_year = formats.date_format(obj.sale_month, format="YEAR_MONTH_FORMAT", use_l10n=True)
         return month_year
 
-    month.short_description = _('mês')
+    month_year.short_description = _('mês')
 
     def has_add_permission(self, request):
         return False
+
+    def get_queryset(self, request):
+        q = super().get_queryset(request)
+        self.request = request
+        company_id = self.get_company_id()
+        if company_id is None:
+            return q
+
+        return q.filter(company__id__exact=company_id)
+
+    def get_company_id(self):
+        company_id = self.request.GET.get('company__id__exact')
+        if company_id:
+            return company_id
+
+        changelist_filters = self.request.GET.get('_changelist_filters')
+        lookup_filters = {}
+        if changelist_filters:
+            lookup_filters = dict(param.split('=') for param in changelist_filters.split('&'))
+
+        return lookup_filters.get('company__id__exact')
