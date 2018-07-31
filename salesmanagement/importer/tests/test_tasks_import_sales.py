@@ -27,11 +27,12 @@ class ImportSalesTaskSuccessTest(TestCase):
              'total': Money(107.5, 'BRL')}
         ]
 
+        task_patcher = patch('salesmanagement.importer.tasks.import_sales_task.delay')
         patcher_parser = patch.object(ParserSalesXlsx, 'as_data', return_value=parsed_xlsx)
         patcher_storage = mock_storage('sales_imported_files/FileName.xlsx')
         notify_patcher = patch("salesmanagement.importer.models.notify", return_value=MagicMock(send=MagicMock()))
 
-        with patcher_storage, patcher_parser, notify_patcher:
+        with patcher_storage, patcher_parser, task_patcher, notify_patcher:
             cls.sale_file = SalesImportFileFactory.create(company__name='Company Name')
             import_sales_task(cls.sale_file.pk)
 
@@ -74,11 +75,12 @@ class ImportSalesTaskFailTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        task_patcher = patch('salesmanagement.importer.tasks.import_sales_task.delay')
         patcher_parser = patch.object(ParserSalesXlsx, 'as_data', return_value=[])
         patcher_storage = mock_storage('sales_imported_files/FileName.xlsx')
         notify_patcher = patch("salesmanagement.importer.models.notify", return_value=MagicMock(send=MagicMock()))
 
-        with patcher_storage, patcher_parser, notify_patcher:
+        with patcher_storage, patcher_parser, task_patcher, notify_patcher:
             cls.sale_file = SalesImportFileFactory.create(company__name='Company Name')
             import_sales_task(cls.sale_file.pk)
 

@@ -1,11 +1,10 @@
 from datetime import date
 from pathlib import Path
+from unittest.mock import patch
 
 from django.contrib.messages import get_messages
-from django.db.models import signals
 from django.shortcuts import resolve_url as r
 from django.test import TestCase
-from factory.django import mute_signals
 
 from salesmanagement.core.factories import RandomUserFactory
 from salesmanagement.importer.factories import SalesImportFileFactory
@@ -72,7 +71,9 @@ class SalesImportViewPostValid(TestCase):
         file_path = Path('sales_imported_files/FileName.xlsx')
         data = dict(user=user.pk, company='Company Name', month='01/07/2018',
                     file=get_temporary_text_file(file_path.name))
-        with mock_storage(file_path.as_posix()), mute_signals(signals.post_save):
+
+        task_patcher = patch('salesmanagement.importer.tasks.import_sales_task.delay')
+        with mock_storage(file_path.as_posix()), task_patcher:
             self.response = self.client.post(r('importer:sales-import'), data)
 
     def test_post(self):
@@ -166,7 +167,10 @@ class SalesImportViewPostInvalidMounth(TestCase):
         data = dict(user=user.pk, company='Company Name', month='01/07/2018', file=file)
 
         self.client.login(username=user.username, password='pass')
-        with mock_storage('sales_imported_files/FileName.xlsx'), mute_signals(signals.post_save):
+        task_patcher = patch('salesmanagement.importer.tasks.import_sales_task.delay')
+        storage_partcher = mock_storage('sales_imported_files/FileName.xlsx')
+
+        with storage_partcher, task_patcher:
             self.obj = SalesImportFileFactory.create(company=company, month=month)
             self.response = self.client.post(r('importer:sales-import'), data)
 
