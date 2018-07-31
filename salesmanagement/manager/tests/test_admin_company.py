@@ -1,5 +1,6 @@
 import re
 from datetime import date
+from unittest.mock import MagicMock
 
 from django.contrib import admin
 from django.test import TestCase
@@ -27,6 +28,10 @@ class CompanyAdminTest(TestCase):
 
     def test_products_count_result_when_no_products(self):
         """Must return 0 products count because they don't exist"""
+        self.assertEqual(0, self.admin.products_count(self.company))
+
+    def test_products_count_result_on_create(self):
+        """Must return 0 products count because company don't exist"""
         self.assertEqual(0, self.admin.products_count(self.company))
 
     def test_sold_products_field(self):
@@ -70,6 +75,10 @@ class CompanyAdminTest(TestCase):
         matchs = self.match_related_links(links)
         self.assertTrue(matchs)
         self.assertIn('<a class="list_filter_link" href=', links)
+
+    def test_related_links_result_on_create(self):
+        """Must return empty, company don't exist"""
+        self.assertEqual('', self.admin.related_links(MagicMock(pk=None, id=None)))
 
     def test_related_links_media(self):
         """Must add a related_links.css"""

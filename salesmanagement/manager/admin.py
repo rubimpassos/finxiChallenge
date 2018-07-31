@@ -80,7 +80,9 @@ class CompanyAdmin(admin.ModelAdmin):
         }
 
     def products_count(self, obj):
-        return obj.product_set.count()
+        if not obj.pk:
+            return 0
+        return obj.product_set.count() or 0
 
     products_count.short_description = _('quantidade de produtos')
 
@@ -99,6 +101,8 @@ class CompanyAdmin(admin.ModelAdmin):
     best_seller.short_description = _('produto mais vendido')
 
     def related_links(self, obj):
+        if not obj.pk:
+            return ''
         links = ''
         for f in self.fields_related_links:
             m = getattr(self, f, lambda n: '')
