@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      - celeryworker
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    command: /docker-entrypoint.sh
+
+  redis:
+    image: redis:5.0
+
+  celeryworker:
+    <<: *django
+    depends_on:
+      - redis
+    ports: []
+    command: celery -A salesmanagement.celery worker -l INFO

@@ -1,2 +1,9 @@
 -r requirements.txt
 jupyter
+pytest==3.6.3
+pytest-dependency===0.3.2
+pytest-django==3.3.2
+pytest-ordering==0.5
+pytest-sugar==0.9.1
+mock-django==0.6.10
+factory-boy==2.11.1

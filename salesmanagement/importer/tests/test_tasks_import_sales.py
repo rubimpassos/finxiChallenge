@@ -1,3 +1,5 @@
+import pytest
+
 from datetime import date
 from unittest.mock import patch, MagicMock
 
@@ -12,6 +14,8 @@ from salesmanagement.importer.models import SalesImportFile
 from salesmanagement.importer.parser import ParserSalesXlsx
 from salesmanagement.importer.tasks import import_sales_task
 from salesmanagement.manager.models import Product, ProductCategory, ProductsSale
+
+pytestmark = pytest.mark.django_db
 
 
 class ImportSalesTaskSuccessTest(TestCase):

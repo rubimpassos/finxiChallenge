@@ -18,22 +18,22 @@
 ## Getting Started
 
 1. Clone this repository
-2. Install Python 3.7+ and create a virtualenv
-3. Activate the virtualenv
-4. Install the dependencies
-5. Configure .env instance
+2. Install Docker and Docker Compose
+3. Copy env_sample
+3. Build docker-compose-dev.yml
 6. Run the tests
-
-OBS: If you are on windows I recomend you to use rabbit-mq for work with celery, and you must set FORKED_BY_MULTIPROCESSING=1 var environment else celery do not work
 
 ```console
 git clone https://rubimpassos@bitbucket.org/rubimpassos/finxichallenge.git finxiChallenge
 cd finxiChallenge
-python -m venv .venv
-source .venv/Scripts/activate.bat
-pip install -r requirements-dev.txt
 cp contrib/env-sample .env
-python -m pytest -rsx
+docker-compose -f docker-compose-dev.yml build
+docker-compose -f docker-compose-dev.yml run --rm django pytest -rsx
+```
+
+# Run the project
+```console
+docker-compose -f docker-compose-dev.yml up
 ```
 
 ## Deployment

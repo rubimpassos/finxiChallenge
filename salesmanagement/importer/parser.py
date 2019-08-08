@@ -18,6 +18,7 @@ class ParserSalesXlsx:
 
         for i, row in enumerate(ws.rows):
             if len(row) != self.max_columns:
+                print(len(row))
                 return []
 
             if i == 0:
@@ -64,6 +65,5 @@ class ParserSalesXlsx:
         if isinstance(currency, float):
             return Money(currency, 'BRL')
 
-        n = str(currency).replace('R$', '').strip()
-        locale.setlocale(locale.LC_ALL, 'Portuguese_Brazil.1252')
-        return Money(locale.atof(n), 'BRL')
+        n = str(currency).replace('R$', '').replace('.', '').replace(',', '.').strip()
+        return Money(n, 'BRL')
